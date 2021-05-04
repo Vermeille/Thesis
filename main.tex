@@ -1,0 +1,153 @@
+% Purpose: an example .tex file for the thesis.
+
+\documentclass[11pt,leqno]{report}
+
+\usepackage{ur_thesis}
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{xcolor}		% make links dark blue
+\definecolor{darkblue}{rgb}{0, 0, 0.5}
+\hypersetup{colorlinks=true,citecolor=darkblue, linkcolor=darkblue, urlcolor=darkblue}
+  
+% citation style can be whatever is "accepted in your field"
+\usepackage[round]{natbib}
+
+\begin{document}
+
+\sloppy
+\title{Hast Thou Slain the Jabberwock?}
+\author{Guillaume SANCHEZ}
+\thesissupervisor{Frédéric BOUCHARA, Vincente GUIS, Ricard MARXER}
+\thesisdepartment{Laboratoire Informatique et Systèmes}
+\maketitle
+
+% Feb 24, 2010 vandurme> the graduate office wanted a "ii" on the top right
+% corner of the dedication page (lowercase Roman numeral page numbering), which
+% explains the slightly messy tex code for this page:
+
+%%%dedication page
+\thispagestyle{empty}
+%\thispagestyle{plain}
+\newenvironment{dedication}
+{\cleardoublepage \thispagestyle{empty} \vspace*{\stretch{1}}
+  \begin{center} \em}
+  {\end{center} \vspace*{\stretch{3}} }
+\begin{dedication}
+
+  %% To ... 
+
+\end{dedication}
+
+%%% CV page
+\begin{curriculumvitae}
+
+  Previous degrees and experience.
+
+\end{curriculumvitae}
+
+\begin{acknowledgments}
+
+  Thanks to collaborators and supporters.
+
+  %% Additional personal acknowledgments ...
+
+ 
+\end{acknowledgments}
+
+\begin{abstract}
+
+  A brief summary.
+  
+\end{abstract}
+
+
+
+\begin{contributors}
+
+This work was supervised by a dissertation committee consisting of Professors
+X, Y, and Z. 
+This material is based upon work supported by the National Science Foundation Award
+XXXXXXX.  Any opinions, findings, and conclusions or recommendations
+expressed in this material are those of the author and do not necessarily
+reflect the views of above named organization.
+
+\end{contributors}
+
+
+\tableofcontents
+\listoftables
+\listoffigures
+
+\chapter{Introduction}
+
+\chapter{Latex Tips}
+
+\section{Citations}
+
+This template uses the \verb|natbib|
+package.
+Use the command \verb|\cite| for citations in parentheses.
+Use the command \verb|\citet| for citations in text.
+Use the command \verb|\citeyearpar| for the year only, in parentheses.
+For example,
+\begin{verbatim}
+    ... as in \LaTeX\ \cite{Lamport86} ...
+    ... and \citet{Knuth86} claims ...
+    ... and Knuth's later work \citeyearpar{Knuth86} claims ...
+\end{verbatim}
+will result in
+\begin{quote}
+... as in \LaTeX\ \cite{Lamport86} ...\\
+... and \citet{Knuth86} claims ...\\
+... and Knuth's later work \citeyearpar{Knuth86} claims ...
+\end{quote}
+
+You can change the template to use another citation style if you prefer.  The only requirement is that citations appear in the style ``accepted in your field.''
+
+\section{Math}
+
+Use \verb|\log| and \verb|\exp|, not \verb|log| and \verb|exp|.
+
+Blank lines start a new paragraph - don't start
+a new paragraph after an equation in the middle of a sentence.
+Use
+\begin{verbatim}
+\[ e^{\pi i} = -1 \]
+where $i=\sqrt{-1}.$ 
+\end{verbatim}
+NOT
+\begin{verbatim}
+\[ e^{\pi i} = -1 \]
+
+where $i=\sqrt{-1}.$ 
+\end{verbatim}
+in order to avoid having the word ``where'' indented as the
+beginning of a new paragraph.
+
+Use \verb|\left(| and \verb|\right)| to get parens that are the right size for whatever is inside them.
+
+For a variable or function name consisting of more than one letter, use \verb|\mathit{func}| or \verb|\mathrm{func}|.  Otherwise, latex interprets this as $f*u*n*c$.
+
+For angled brackets to denote tuples, use \verb|\langle| and \verb|\rangle|, not \verb|<| and \verb|>|.
+
+\section{Text}
+
+TeX assumes that a period ends a sentence unless it follows an uppercase letter.
+Use \verb|Smith et al.\ claim|, not \verb|Smith et al. claim|.
+At the end of a sentence, use \verb|consisting of an NP\@.|, not \verb|consisting of an NP.|.
+
+``et al.'' is ``et al.'', not ``et. al.'' or ``et. al''
+
+\chapter{Conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\chapter{More stuff}
+
+
+\end{document}
+
+
+
