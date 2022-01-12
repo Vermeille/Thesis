@@ -8,25 +8,37 @@
 %
 % margin settings
 %
-\oddsidemargin 0.5in       %   Left margin on right-hand pages.
-\evensidemargin 0in        %   Left margin on left-hand pages.
-\textwidth 6in
-\textheight 8.5in
+%\oddsidemargin 0.5in       %   Left margin on right-hand pages.
+%\evensidemargin 0in        %   Left margin on left-hand pages.
+%\textwidth 6in
+%\textheight 8.5in
 \footskip 30pt
+
+%The margins
+\oddsidemargin  2.2truemm
+\evensidemargin 2.2truemm
+
+\topmargin 0truept
+\headheight 0truept
+\headsep 0truept
+%\footheight 0truept
+%\footskip 0truept
+\textheight 229truemm
+\textwidth 158truemm
 %
 % paragraph settings
 %
-\parskip 4pt plus 1.5pt minus 1.5pt
-\clubpenalty 500
-\widowpenalty 500
-\displaywidowpenalty=500
+ %\parskip 4pt plus 1.5pt minus 1.5pt
+ %\clubpenalty 500
+ %\widowpenalty 500
+ %\displaywidowpenalty=500
 %
 % more spacing between text and footnote
 %
 \def\footnoterule{\kern 2pt% extra space
 \kern-3\p@\hrule width .4\columnwidth\kern 2.6\p@}
 \footnotesep 10pt % more space between footnotes
-\textwidth 5.75in
+%\textwidth 5.75in
 
 \topmargin -.5in
 \headheight 12pt
@@ -41,7 +53,7 @@
 % standards was confused.  Cannot be changed because it is a rule.
 % (NGM)
 %
-\renewcommand{\baselinestretch}{1.5}
+%\renewcommand{\baselinestretch}{1.5}
 \newcommand{\singlespacethesis}{\def\baselinestretch{1}}
 %
 % year date format.  Required by new manual 1992 (NGM)
@@ -94,7 +106,7 @@ Thesis Proposal\\~\\for the Degree\vskip 2ex}}
 %
 \def\thesisuniversity#1{\gdef\@thesisuniversity{#1}}
 \def\@thesisuniversity{\vskip 3ex
-University of Rochester\\Rochester, New York}
+Université de Toulon\\Toulon, France}
 %
 % redefine maketitle to use the empty page style
 %
@@ -307,6 +319,7 @@ University of Rochester\\Rochester, New York}
     \let\citeN\cite \let\shortcite\cite
     \let\citeasnoun\cite
  }
+
 %\list
 %  {[\arabic{enumi}]}{\settowidth\labelwidth{[#1]}\leftmargin\labelwidth
 %    \advance\leftmargin\labelsep

@@ -5,25 +5,58 @@
 \usepackage{ur_thesis}
 \usepackage{times}
 \usepackage{hyperref}
-\usepackage{xcolor}		% make links dark blue
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[font=small]{caption}
+\usepackage[nohyperlinks]{acronym}
+\usepackage[utf8x]{inputenc}
 \definecolor{darkblue}{rgb}{0, 0, 0.5}
 \hypersetup{colorlinks=true,citecolor=darkblue, linkcolor=darkblue, urlcolor=darkblue}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+\newcommand{\arr}[0]{\texorpdfstring{$\Rightarrow$}{=>}}
   
 % citation style can be whatever is "accepted in your field"
-\usepackage[round]{natbib}
+\usepackage[numbers]{natbib}
+%\usepackage{natbib}
 
 \begin{document}
 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolour},   commentstyle=\color{codegreen},
+  keywordstyle=\color{magenta},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=4
+}
+\lstset{style=mystyle}
+
+\newcommand{\IE}{\mathbb{E}}
 \sloppy
-\title{Hast Thou Slain the Jabberwock?}
+\title{Creating and exploiting metadata for video content recommendation}
 \author{Guillaume SANCHEZ}
-\thesissupervisor{Frédéric BOUCHARA, Vincente GUIS, Ricard MARXER}
+\thesissupervisor{Frédéric BOUCHARA, Ricard MARXER, Vincente GUIS}
 \thesisdepartment{Laboratoire Informatique et Systèmes}
 \maketitle
-
-% Feb 24, 2010 vandurme> the graduate office wanted a "ii" on the top right
-% corner of the dedication page (lowercase Roman numeral page numbering), which
-% explains the slightly messy tex code for this page:
 
 %%%dedication page
 \thispagestyle{empty}
@@ -39,20 +72,11 @@
 \end{dedication}
 
 %%% CV page
-\begin{curriculumvitae}
+%\begin{curriculumvitae}\end{curriculumvitae}
 
-  Previous degrees and experience.
-
-\end{curriculumvitae}
-
-\begin{acknowledgments}
-
-  Thanks to collaborators and supporters.
-
-  %% Additional personal acknowledgments ...
-
- 
-\end{acknowledgments}
+%\begin{acknowledgments}
+%  Thanks to collaborators and supporters.
+%\end{acknowledgments}
 
 \begin{abstract}
 
@@ -75,77 +99,46 @@ reflect the views of above named organization.
 
 
 \tableofcontents
-\listoftables
-\listoffigures
+%\listoftables
+%\listoffigures
 
-\chapter{Introduction}
+%\include{facerec}
 
-\chapter{Latex Tips}
-
-\section{Citations}
-
-This template uses the \verb|natbib|
-package.
-Use the command \verb|\cite| for citations in parentheses.
-Use the command \verb|\citet| for citations in text.
-Use the command \verb|\citeyearpar| for the year only, in parentheses.
-For example,
-\begin{verbatim}
-    ... as in \LaTeX\ \cite{Lamport86} ...
-    ... and \citet{Knuth86} claims ...
-    ... and Knuth's later work \citeyearpar{Knuth86} claims ...
-\end{verbatim}
-will result in
-\begin{quote}
-... as in \LaTeX\ \cite{Lamport86} ...\\
-... and \citet{Knuth86} claims ...\\
-... and Knuth's later work \citeyearpar{Knuth86} claims ...
-\end{quote}
-
-You can change the template to use another citation style if you prefer.  The only requirement is that citations appear in the style ``accepted in your field.''
-
-\section{Math}
-
-Use \verb|\log| and \verb|\exp|, not \verb|log| and \verb|exp|.
-
-Blank lines start a new paragraph - don't start
-a new paragraph after an equation in the middle of a sentence.
-Use
-\begin{verbatim}
-\[ e^{\pi i} = -1 \]
-where $i=\sqrt{-1}.$ 
-\end{verbatim}
-NOT
-\begin{verbatim}
-\[ e^{\pi i} = -1 \]
-
-where $i=\sqrt{-1}.$ 
-\end{verbatim}
-in order to avoid having the word ``where'' indented as the
-beginning of a new paragraph.
-
-Use \verb|\left(| and \verb|\right)| to get parens that are the right size for whatever is inside them.
-
-For a variable or function name consisting of more than one letter, use \verb|\mathit{func}| or \verb|\mathrm{func}|.  Otherwise, latex interprets this as $f*u*n*c$.
-
-For angled brackets to denote tuples, use \verb|\langle| and \verb|\rangle|, not \verb|<| and \verb|>|.
-
-\section{Text}
-
-TeX assumes that a period ends a sentence unless it follows an uppercase letter.
-Use \verb|Smith et al.\ claim|, not \verb|Smith et al. claim|.
-At the end of a sentence, use \verb|consisting of an NP\@.|, not \verb|consisting of an NP.|.
-
-``et al.'' is ``et al.'', not ``et. al.'' or ``et. al''
-
-\chapter{Conclusion}
+\include{10-intro}
+\include{20-hexa}
+\include{30-activity}
+\include{40-label-noise}
+\include{50-facerec}
+\include{60-gan-vae}
+\include{70-recommender}
+%\include{90-torchelie}
 
 \bibliographystyle{plainnat}
-\bibliography{references}
+\bibliography{references,40-label-noise,50-facerec,60-gan-vae,70-recommender}
 
 \appendix
-\chapter{More stuff}
+\chapter{Notations and conventions}
 
+Unless otherwise specified in the text, these are the default notations and conventions used throughout the manuscript.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{r|l}
+        $x$ & $x$ is either a scalar value or of an unspecified or irrelevant type, depending on the context \\
+        $\textbf{x}$ & the vector $\textbf{x}$ \\
+        $X$ & the matrix $X$ \\
+        $x \sim p(x)$ & $x$ is sampled according to the probability distribution $p(x)$ \\
+        $\mu$, $\sigma$ & Mean and standard-deviation \\
+        $\mathcal{N}(\mu, \sigma)$ & Normal distribution of mean $\mu$ and standard-deviation $\sigma$ \\
+        $\mathcal{N}(x ; \mu, \sigma)$ & Likelihood of $x$ according to a normal distribution of mean $\mu$ and standard-deviation $\sigma$ \\
+        $\texttt{Cat}(x ; \theta)$ & Probability of event x for categorical distribution with parameters $\theta$ \\
+    \end{tabular}
+    \caption{Notations and conventions}
+    \label{tab:my_label}
+\end{table}
+
+\chapter{Acronyms}
+\include{acronyms}
 
 \end{document}
 

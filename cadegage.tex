@@ -1,0 +1,114 @@
+\subsection{Augmenting RandAugment}
+
+\subsubsection{Scope of the study}
+
+RandAugment is an augmentation strategy that aims to be both simple to use and implement. It aims to improve on AutoAugment and other data augmentation policies that were computationally searched for.
+
+RandAugment considers a pool of K transforms among the traditional PIL Image available transforms, applies a sequence of N transforms with magnitude M. M is a single and shared factor characterizing how "strong" each transformation is.
+
+We consider some more augmentations to add to the pool of available transforms and evaluate their impact: random perspective, greyscale, subsampling, JPEG artifacts, Canny edge detection, Mixup \citep{mixup}, Cutmix \citep{cutmix}. As Mixup and Cutmix normally require to adapt the targets and the training loss, we consider them just as image transforms, knowingly disregarding the rest.
+
+\subsubsection{Mixup}
+
+Mixup considers a pair of images $x_0, x_1$ and their associated, one hot encoded, class label $y_0, y_1$. Mixup then generates a new training sample $x= \lambda x_0 + (1-\lambda) x_1$ by blending the pixels, and its soft, blended, class label $y=\lambda y_0 + (1-\lambda) y_1$, where $\lambda~\text{Beta}(\alpha, \alpha)$.
+
+Here, care is taken to ensure that the second image, corrupting the first, does not dominate in the resulting sample so as to keep a meaningful class label. Practically, I use $\min(\lambda, 1-\lambda)$ instead of $\lambda$ as a mixing factor.
+
+\subsubsection{Cutmix}
+
+Building on Mixup, Cutmix instead proposes to stitch a part of an image onto another, and consider the resulting class target as the ratio of the number of pixels on the resulting image.
+
+Here, care is taken to ensure that the second image crop, corrupting the first, does not dominate in the resulting sample so as to keep a meaningful class label. Practically, not more than a quarter of the image is replaced.
+
+\subsubsection{Experiments}
+
+We run our experiments on Imagenette \citep{imagenette}, with a resnet18, trained for 80 epochs on images resized and cropped to 128x128 pixels. Shorter training periods make the augmentations detrimental instead of being an improvement. The model is trained with RAdamW \citep{radam} and Lookahead \citep{lookahead}, both implemented in \texttt{torchelie.optim}, whose combination is known as Ranger \citep{ranger}.
+
+We search for hyper parameters using \texttt{torchelie.hyper} on random validation subset of 20\% of the training set held out for hyper parameters search. The best found parameters are lr=0.001, wd=0.002, $\beta_1$=0.85.
+
+All tests implement random zooming and cropping and horizontal flips. Starting with a baseline with a standard RandAugment(N=2, M=10) achieving 93.55\%; and no augmentations at all achieving 92.35\%, adding all those new transforms actually degrades the performance to 92.91\%. The main culprit found is the Canny filter. Removing it gets the score back to the standard RandAugment, without further gains.
+
+\subsubsection{Results}
+
+New proposed single image transforms seem to significantly degrade performance (-0.14) while Mixup significantly boosts the model (+0.20). The case is not very cut for Cutmix and Canny. In search for the optimal policy, we consider combinations of them and try to find which transform (if any) is guilty of the performance degradation among the Single set.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{Augmentations} & \textbf{Accuracy} & \textbf{Improvement} & p-value \\
+        \hline
+        RandAugment (baseline) & $93.20\% \pm 0.17$ & +0 & 1.0 \\
+        \hline
+        \hline
+        No augmentation & $91.50\% \pm 0.47$ & -1.70 &  0.005 \\
+        \hline
+        + Canny & $93.23\% \pm 0.20$ & +0.02 &  0.86 \\
+        \hline
+        + Cutmix & $93.23\% \pm 0.22$ & +0.02 & 0.87 \\
+        \hline
+        + Single & $93.27 \% \pm 0.21$ & +0.07 &  0.58 \\
+        \hline
+        + Mixup & $93.36\% \pm 0.23$ & +0.155 & 0.28 \\
+        \hline
+        \hline
+        + Canny, Cutmix, Mixup & $92.98\% \pm 0.20$ & -0.23 & 0.10 \\
+        \hline
+    \end{tabular}
+    \caption{Results on Imagenette for 20 epochs. For each configuration, the mean and standard deviation of 4 runs are reported. On the second column, the difference to the standard RandAugment is shown.}
+    \label{tab:imagenette-randaugment}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{Augmentations} & \textbf{Accuracy} & \textbf{Improvement} & p-value \\
+        \hline
+        RandAugment (baseline) & $86.05\% \pm 0.34$ & +0 & 1.0 \\
+        \hline
+        \hline
+        No augmentation & $84.40\% \pm 0.39$ & -1.39 &  0.002 \\
+        \hline
+        + Canny & $86.08\% \pm 0.19$ & +0.29 &  0.21 \\
+        \hline
+        + Cutmix & $86.19\% \pm 0.33$ & +0.4 & 0.14 \\
+        \hline
+        + Single & $85.77 \% \pm 0.15$ & -0.02 &  0.91 \\
+        \hline
+        + Mixup & $86.06\% \pm 0.15$ & +0.27 & 0.22 \\
+        \hline
+        \hline
+        + Canny, Cutmix, Mixup & $85.75\% \pm 0.47$ & -0.03 & 0.90 \\
+        \hline
+    \end{tabular}
+    \caption{Results on ImageWoof for 20 epochs. For each configuration, the mean and standard deviation of 4 runs are reported. On the second column, the difference to the standard RandAugment is shown.}
+    \label{tab:imagenette-randaugment}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{Augmentations} & \textbf{Accuracy} & \textbf{Improvement} & p-value \\
+        \hline
+        RandAugment (baseline) & $93.20\% \pm 0.17$ & +0 & 1.0 \\
+        \hline
+        \hline
+        No augmentation & $91.50\% \pm 0.47$ & -1.70 &  0.005 \\
+        \hline
+        + Canny & $93.23\% \pm 0.20$ & +0.02 &  0.86 \\
+        \hline
+        + Cutmix & $93.23\% \pm 0.22$ & +0.02 & 0.87 \\
+        \hline
+        + Single & $93.27 \% \pm 0.21$ & +0.07 &  0.58 \\
+        \hline
+        + Mixup & $93.36\% \pm 0.23$ & +0.155 & 0.28 \\
+        \hline
+        \hline
+        + Canny, Cutmix, Mixup & $92.98\% \pm 0.20$ & -0.23 & 0.10 \\
+        \hline
+    \end{tabular}
+    \caption{Results on ImageWoof for 200 epochs. For each configuration, the mean and standard deviation of 4 runs are reported. On the second column, the difference to the standard RandAugment is shown.}
+    \label{tab:imagenette-randaugment}
+\end{table}
