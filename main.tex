@@ -14,6 +14,7 @@
 \usepackage[font=small]{caption}
 \usepackage[nohyperlinks]{acronym}
 \usepackage[utf8x]{inputenc}
+%\usepackage{refcheck}
 \definecolor{darkblue}{rgb}{0, 0, 0.5}
 \hypersetup{colorlinks=true,citecolor=darkblue, linkcolor=darkblue, urlcolor=darkblue}
 
@@ -53,56 +54,20 @@
 \newcommand{\IE}{\mathbb{E}}
 \sloppy
 \title{Creating and exploiting metadata for video content recommendation}
-\author{Guillaume SANCHEZ}
+\author{Guillaume "Vermeille" SANCHEZ}
 \thesissupervisor{Frédéric BOUCHARA, Ricard MARXER, Vincente GUIS}
 \thesisdepartment{Laboratoire Informatique et Systèmes}
+\thesisdegree{Doctor of Philosophy\\(Computer Science, Deep Learning, Computer Vision)}
 \maketitle
 
-%%%dedication page
-\thispagestyle{empty}
-%\thispagestyle{plain}
-\newenvironment{dedication}
-{\cleardoublepage \thispagestyle{empty} \vspace*{\stretch{1}}
-  \begin{center} \em}
-  {\end{center} \vspace*{\stretch{3}} }
-\begin{dedication}
-
-  %% To ... 
-
-\end{dedication}
-
-%%% CV page
-%\begin{curriculumvitae}\end{curriculumvitae}
-
-%\begin{acknowledgments}
-%  Thanks to collaborators and supporters.
-%\end{acknowledgments}
-
-\begin{abstract}
-
-  A brief summary.
-  
-\end{abstract}
-
-
-
-\begin{contributors}
-
-This work was supervised by a dissertation committee consisting of Professors
-X, Y, and Z. 
-This material is based upon work supported by the National Science Foundation Award
-XXXXXXX.  Any opinions, findings, and conclusions or recommendations
-expressed in this material are those of the author and do not necessarily
-reflect the views of above named organization.
-
-\end{contributors}
+\include{05-abstract}
 
 
 \tableofcontents
-%\listoftables
-%\listoffigures
+\listoftables
+\listoffigures
 
-%\include{facerec}
+\newcommand{\p}[0]{p}
 
 \include{10-intro}
 \include{20-hexa}
@@ -111,13 +76,14 @@ reflect the views of above named organization.
 \include{50-facerec}
 \include{60-gan-vae}
 \include{70-recommender}
-%\include{90-torchelie}
+\include{90-torchelie}
+\include{100-conclusion}
 
 \bibliographystyle{plainnat}
-\bibliography{references,40-label-noise,50-facerec,60-gan-vae,70-recommender}
+\bibliography{references,40-label-noise,50-facerec,60-gan-vae,70-recommender,90-torchelie}
 
 \appendix
-\chapter{Notations and conventions}
+\chapter{Notations, conventions and acronyms}
 
 Unless otherwise specified in the text, these are the default notations and conventions used throughout the manuscript.
 
@@ -126,19 +92,24 @@ Unless otherwise specified in the text, these are the default notations and conv
     \begin{tabular}{r|l}
         $x$ & $x$ is either a scalar value or of an unspecified or irrelevant type, depending on the context \\
         $\textbf{x}$ & the vector $\textbf{x}$ \\
-        $X$ & the matrix $X$ \\
-        $x \sim p(x)$ & $x$ is sampled according to the probability distribution $p(x)$ \\
+        $X$ & the matrix $X$ or set $X$\\
+        $x \sim \p(x)$ & $x$ is sampled according to the probability distribution $p(x)$ \\
         $\mu$, $\sigma$ & Mean and standard-deviation \\
         $\mathcal{N}(\mu, \sigma)$ & Normal distribution of mean $\mu$ and standard-deviation $\sigma$ \\
         $\mathcal{N}(x ; \mu, \sigma)$ & Likelihood of $x$ according to a normal distribution of mean $\mu$ and standard-deviation $\sigma$ \\
         $\texttt{Cat}(x ; \theta)$ & Probability of event x for categorical distribution with parameters $\theta$ \\
+        $|A|$ & cardinal of set $A$ \\
+        $H(p)$ & Entropy of distribution $p$ \\
+        $H(p, q)$ & Cross-Entropy of distributions $p$ and $q$ \\
     \end{tabular}
     \caption{Notations and conventions}
-    \label{tab:my_label}
+    \label{tab:notations}
 \end{table}
 
-\chapter{Acronyms}
+%\chapter{Acronyms}
 \include{acronyms}
+
+
 
 \end{document}
 

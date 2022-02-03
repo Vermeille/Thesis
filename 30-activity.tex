@@ -1,4 +1,7 @@
 \chapter{Machine Learning}
+\label{chap:activity}
+
+\section{Introduction}
 
 As an introductory material, this chapter introduces what Machine Learning is and how it works. This chapter will illustrate the notions through the lens of activity recognition in images. However, the foundations laid out here are not limited to this use case and are indeed more general. The explanations will alternate between the specific use cases, to ease the intuitive understanding, and the more abstract concepts in order to make the generality of the techniques clear.
 
@@ -66,7 +69,7 @@ Fortunately, it has been shown that width can be traded with depth \cite{widthde
 
 \subsection{Training neural networks}
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \includegraphics[width=\columnwidth]{30-activity/workflow.pdf}
     \caption{A neural network training loop}
@@ -75,7 +78,7 @@ Fortunately, it has been shown that width can be traded with depth \cite{widthde
 
 After describing what neural networks \emph{are}, it is necessary to describe how they \emph{work}. Neural networks are stacks of non-linear layers, composed of many tunable weights $\theta$ computing data transforms. How do we train them?
 
-Neural Networks are built from differentiable components, making $f_\theta(\cdot)$, the function they compute, differentiable as well. In the simplest case, the training dataset provides an input $x$ and expected correct answer $y$. We compute $\hat{y}=f(x)$, the maximum likelihood answer given by the network. Then, a differentiable predefined function $\mathcal{L}(\hat{y}, y)$ computes the distance between the generated answer and the expected correct answer. By differentiating this distance wrt to the parameters $\theta$, we get the direction in which to move $\theta$ to reduce the error. $\theta$ is moved a bit (a step of size $\alpha$) in this direction and the iterative process continues, and $f$ learns to provide better and better answers. This process is called \emph{Gradient Descent}. In Deep Learning, however, \emph{Stochastic Gradient Descent} (SGD) is used. The stochasticity comes from the fact that we compute the gradient on a random subset of the dataset (a \emph{batch} or minibatch), each iteration. This helps regularizing the model (thus providing greater generalization), and descending on the full dataset is often not practically doable anyway since they are usually too big to fit in memory along with the gradient information. Each iteration thus fundamentally computes
+Neural Networks are built from differentiable components, making $f_\theta(\cdot)$, the function they compute, differentiable as well. In the simplest case, the training dataset provides an input $x$ and expected correct output $y$. We compute $\hat{y}=f(x)$ the output of the network. Then, a differentiable predefined function $\mathcal{L}(\hat{y}, y)$ computes the distance between the generated output and the expected correct output. By differentiating this distance wrt to the parameters $\theta$, we get the direction in which to move $\theta$ to reduce the error. $\theta$ is moved a bit (a step of size $\alpha$) in this direction and the iterative process continues, and $f$ learns to provide outputs closer and closer to the target output. This process is called \emph{Gradient Descent}. In Deep Learning, however, \emph{Stochastic Gradient Descent} (SGD) is used. The stochasticity comes from the fact that we compute the gradient on a random subset of the dataset (a \emph{batch} or minibatch), each iteration. This helps regularizing the model (thus providing greater generalization), and descending on the full dataset is often not practically doable anyway since they are usually too big to fit in memory along with the gradient information. Each iteration thus fundamentally computes
 
 \begin{equation}
     \theta := \theta - \alpha \nabla_\theta \mathcal{L}(f_\theta(x), y)
@@ -88,9 +91,12 @@ This process is summarized in Figure \ref{fig:trainingloop}.
 \subsection{Data Augmentation}
 \label{sec:trivialaugment}
 
-Last but not least, neural networks have the capacity to fit and memorize even big datasets. When the networks start to memorize the training set, the model overfits and its generalization abilities decrease. One way to fight against that overfitting is to add more training data, but this is often expensive or hard. Instead, one can create artificial new examples by modifying the training set. For images, this can be flipping the pictures, rotating them, changing the illumination, etc. This also injects domain knowledge into the algorithm about the existing invariances. This is called \emph{data augmentation}. Tremendous progress has been made thanks to augmentation strategies \citep{cutmix,randaugment,mixup}. Examples from AutoAugment from \citet{autoaugment} are shown in Figure \ref{fig:autoaugment}.
+Last but not least, neural networks have the capacity to fit and memorize even big datasets. When the networks start to memorize the training set, the model overfits and its generalization abilities decrease. One way to fight against that overfitting is to add more training data, but this is often expensive or hard. Instead, one can create artificial new examples by modifying the training set. For images, this can be flipping the pictures, rotating them, changing the illumination, etc. This also injects domain knowledge into the algorithm about the existing invariances. This is called \emph{data augmentation}. Tremendous progress has been made thanks to augmentation strategies \citep{cutmix,randaugment,mixup,cutout}. Examples from AutoAugment from \citet{autoaugment} are shown in Figure \ref{fig:autoaugment}.
 
-\begin{figure}
+\label{sec:cutout}
+For instance \cite{cutout} randomly erases rectangle parts of the image in order to encourage robustness, by forcing models to rely on several and less salient features.
+
+\begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]{70-files/autoaugment.png}
     \caption{Example of data augmentation. The original image is transformed to artificially generate new training examples. In this case, AutoAugment is used ; it combines multiple transformations and its settings depend on the dataset and the task. Figure from torchvision's documentation. Each row shows the set of augment used for those datasets on a sample image.}
@@ -115,7 +121,7 @@ A convolutional layer is a Perceptron in disguise. It is just applied repeatedly
 
 Convolutions instead of Perceptrons builds into the model what are called \emph{inductive biases}: they perform local operations - addressing compositionality - and performs them the same way everywhere on the picture - addressing translational invariance -. \acp{CNN} got fame in 2012 when they beat their competitors in the ImageNet classification challenge by a large margin and created the deep learning hype we know today \citep{alexnet}.
 
-\begin{figure}
+\begin{figure}[t]
     \centering
     \includegraphics[scale=0.5]{30-activity/AlexNet.png}
     \caption{AlexNet architecture, built from convolutions (CONV), pooling operations (POOL), and linear layers (FC). Figure from \citet{alexnet}}
@@ -124,7 +130,7 @@ Convolutions instead of Perceptrons builds into the model what are called \emph{
 
 The convnet that made deep learning attractive by winning ImageNet is \textbf{AlexNet} \citep{alexnet} (see Figure \ref{fig:alexnet}). It contains 5 conv layers, 2 max pooling layers, and 3 linear layers (also called Fully Connected layers). Max Pooling are meant to reduce the spatial size in order to reduce both memory and compute consumption, and increase the working region of each convolution. As the image is processed through the convnet, it produces layers of activations, that gets abstracted in neural representations. Deep representations have a low spatial resolution but rich semantics \citep{deepbelief,deepviz}.
 
-\begin{figure}
+\begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]{30-activity/googlenet.png}
     \caption{GoogLeNet / Inception-v1. It uses complex building blocks, aggregating different design decisions. Figure from \url{https://medium.com/@RaghavPrabhu/cnn-architectures-lenet-alexnet-vgg-googlenet-and-resnet-7c81c017b848}}
@@ -133,7 +139,7 @@ The convnet that made deep learning attractive by winning ImageNet is \textbf{Al
 
 The design of convnets raises many questions: how many channels? what kernel shape? what stride? Should we pool? It is hard to answer those, so, when designing \textbf{GoogLeNet} / \textbf{Inception} \citep{googlenet} (Cf Figure \ref{fig:googlenet}), the Google team stacked many layers of complex building blocks. Each of those blocks is composed of parallel paths taking different design decisions. At train time, the net can learn to use each of those paths to its best.
 
-\begin{figure}
+\begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]{30-activity/VGG_neural_network.png}
     \caption{VGG network. Grey: 3x3 convolution layers; red: pooling layers; blue: linear (or 1x1 convs) layers; green: softmax}. Each activation is described as $\text{Heigth} \times \text{Width} \times \text{Channels}$.
@@ -142,7 +148,7 @@ The design of convnets raises many questions: how many channels? what kernel sha
 
 However, those questions might not be that important after all. The \textbf{VGG} net  \citep{vgg} (Cf Figure \ref{fig:vgg}) uses only 3x3 convolutions, and doubles the number of channels after each pooling operation. Its simplicity encouraged researchers to invest time into simple designs with better fundamental principles rather that complex models.
 
-\begin{figure}
+\begin{figure}[t]
     \centering
     \includegraphics{30-activity/resnet.png}
     \caption{In ResNets, an identity path is added, so that the gradient can flow up to the first layers untouched. Figure from \cite{resnet}}
@@ -202,17 +208,19 @@ The literature explored many variants, including AdamW, RAdam, AdaMax, AMSGrad, 
 
 \subsection{Loss functions}
 
-Any differentiable function that measures the error of the prediction can be used as a loss function. We will quickly lay out the most commonly used functions. 
+Any differentiable function that measures the error of the prediction can be used as a loss function. Choosing or developing loss functions tailored to the problem at hand is one fundamental part of designing a ML system for a task. We will quickly lay out the most commonly used loss functions. 
 
 \subsubsection{Cross-Entropy}
 
-Cross-Entropy is used when the predictions are interpreted as the parameters of a categorical probability distribution. Cross-entropy measures the difference between two categorical distributions: the predicted distribution $p$ and the target distribution $\hat{y}$.
+Cross-entropy measures the difference between two discrete probability distributions $p_a$ and $p_b$ for a random variable $A$ with realizations $a$.
 
 \begin{equation}
-    \mathcal{L}(p, \hat{y}) = - \sum_i \hat{y}_i \log p_i
+    H(p_a, p_b) = - \sum_a p_a(x) \log p_b(x)
 \end{equation}
 
-In order to train a classifier, it optimizes the network's weights to predict a probability of 1 in the target class, reducing the other probabilities towards 0. This is strictly equivalent to maximizing the probability of the target class, or minimizing the negative log likelihood of the target class. The later formulation is preferred as it is computationally cheaper.
+We can use it as a loss function. This implies that $\hat{y}=f(x)$, our neural network, must be interpreted as the conditional probability distribution $\p_f(\hat{y}|x)$ and the target outputs as a probability distribution $\p(y|x)$. Minimizing the cross-entropy (that is, using it as a loss function) reaches its optimum when the two distributions are identical.
+
+In order to train a classifier, we consider the special case with the target distribution $\p(y|x)$ defined as a categorical distribution over the possible classes. This distribution assigns a probability mass of 1 for the correct class, 0 otherwise. Minimizing the cross-entropy in this situation is strictly equivalent to maximizing the predicted probability of the target class, or minimizing the negative log likelihood of the target class. The later formulation is preferred.
 
 A neural network does not produce calibrated probability distributions on its own, but unconstrained scalars. They are often called \emph{logits}, as unnormalized log parameters of the categorical distribution, interpreted as the output of the logit function. Those logits $z_i$ can be be normalized into the categorical distribution parameters $o$ with the softmax function.
 
@@ -222,15 +230,38 @@ A neural network does not produce calibrated probability distributions on its ow
 
 Where $\tau$ is an optional \emph{temperature} parameter that controls the sharpness / entropy of the distribution.
 
-While not being totally accurate, some people call the cross-entropy loss \emph{softmax loss}.
+While not being totally accurate, some people call the cross-entropy loss the \emph{softmax loss}.
 
 \subsubsection{Mean-Squared Error}
 
-When trying to predict continuous values, one's default loss function choice is the L2 distance, or \ac{MSE}
+When trying to predict continuous values, one's default loss function choice is the L2 distance, or \ac{MSE}. It penalizes the prediction more as the difference to the target grows (Figure \ref{fig:l2}). When there is ambiguity, optimizing the MSE will result into predicting the mean value over the possible targets.
 
 \begin{equation}
     \mathcal{L}(y, \hat{y}) = (\hat{y}_i - y_i)^2
 \end{equation}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=6cm]{30-activity/l2.png}
+    \caption{Gradient field of the L2 loss function over a $\mathbb{R}^2$ plane. The black line shows the minimization trajectory from the black dot. We observe that this loss penalizes each variable proportionally to its value.}
+    \label{fig:l2}
+\end{figure}
+
+\subsubsection{L1 Loss}
+
+L1 might be used as well. L2 makes sure that predictions are not diverging too much from the target value; L1 rather encourages the number of exact predictions by penalizing equally any amount of divergence (Figure \ref{fig:l1}). In there is ambiguity, optimizing the L1 distance will result into predicting the median over the possible target values.
+
+\begin{equation}
+    \mathcal{L}(y, \hat{y}) = |\hat{y}_i - y_i|
+\end{equation}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=6cm]{30-activity/l1.png}
+    \caption{Gradient field of the L1 loss function over a $\mathbb{R}^2$ plane. The black line shows the minimization trajectory from the black dot. We observe that this loss penalizes equally each variable, encouraging sparsity.}
+    \label{fig:l1}
+\end{figure}
+
 
 \paragraph{Note: Numerical Considerations} When working with probabilities, computers might run into issues. Probabilities $p_i$ are often multiplied together and can become small, to the point where there could be representation issues with standard IEEE754 32 bits floats. For this reason, when possible, we instead manipulate log probabilities, taking advantage of this property:
 
@@ -267,6 +298,8 @@ In this section we show how a standard image recognition problems can be solved 
 Activity recognition aims to identify what people are doing in still pictures or videos. At Hexaglobe, we are interested in activity tags in order to add metadata to our customers' content. They can be fed to search engines and recommender systems for more relevant results, as well as explicit categorization for a better user experience.
 
 Most of the time, a still picture is enough to infer the activity: people sitting at a table with food are likely eating, people holding a microphone are most probably singing, etc.
+
+Labeling frames with activities can be used in order to improve user browsing and experience. First, the extracted activities can be added as tags to videos so that they become searchable. Then, when a user searches for or is recommended an activity, a relevant thumbnail from the video can be selected instead of a random one. Finally, those activities can be annotated directly on the video player's timeline so that the users can skip to the part they are interested the most
 
 \subsection{The model}
 
@@ -326,7 +359,9 @@ The results, summarized in Table \ref{tab:hactivity_results}, show the power of 
 
 \subsection{Results and interpretation}
 
-We trained a standard modern activity classifier from still pictures on HActions. Although 58\% may seem low, the dataset happens to be fairly small for classes that are loosely defined and somehow semantically hard to distinguish. For instance, if we were to classify dance move frames, the first and last few frames of each move, when the move starts and ends and is not clearly identifiable, this can legitimately be confused with no move at all. Upon manual inspection of the prediction on the test set, we indeed find that most of the errors can be attributed to ambiguity. The remaining errors can be largely attributed to a lack of data as they exhibit patterns not covered in training.
+We trained a standard modern activity classifier from still pictures on HActions. Leveraging data augmentation and pretraining allowed us to jump from 38\% to 58\%. Although 58\% may seem low, the dataset happens to be fairly small for classes that are loosely defined and somehow semantically hard to distinguish. For instance, if we were to classify dance move frames, the first and last few frames of each move, when the move starts and ends and is not clearly identifiable, this can legitimately be confused with no move at all. Upon manual inspection of the prediction on the test set, we indeed find that most of the errors can be attributed to ambiguity. The remaining errors can be largely attributed to a lack of data as they exhibit patterns not covered in training.
+
+For the purpose of annotating frames and thumbnails in order to enrich user experience, those ambiguities are not a problem. Ambiguous frames can be ignored and we can focus on the frames that are not ambiguous. None of the use case we have for those labels need all frames to be annotated with big accuracy. Moreover, since there was no activity based user experience features before, any system that gives reliable predictions will provide more value than none.
 
 We would certainly solve many of those uncertainties by analyzing videos and neighbouring frames instead of independent frames, but that would come at a prohibitive cost. Instead we will consider those samples from a label noise perspective, hoping to construct a dataset without confusing training samples and reject ambiguous samples at inference time.
 

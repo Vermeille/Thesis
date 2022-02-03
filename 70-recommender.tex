@@ -1,17 +1,23 @@
 \chapter{Recommender System}
+\label{chap:recsys}
+
+\section{Introduction}
 
 Now that we learnt how to extract features from videos, those will be fed to a recommender system. In this chapter, we will explore various notable ways of building recommender systems, then dive into how we built ours. This section features various experiments showcasing the importance of various features and augmentation strategies.
 
-\section{Problem setting}
-\subsection{Lexicon}
+When browsing on YouTube for instance, the landing page proposes some content. This content is tailored and suggested according to the visitor. Suggesting videos at random or just the most recent videos would do for a terrible user experience as most of them would not be relevant to the user's interests.
 
-A recommender system setting involves several entities.
+In order to extract the maximum value from the available videos, relevant videos should be favored and presented individually to each different user, and give each one of them a tailored YouTube experience. Selecting those videos that are a good fit for a given user is the role of the recommender system.
 
-\paragraph{The items} are the objects of interest of the application domain. For YouTube, it is videos, for Amazon they are products and for Spotify they are songs.
+\subsection{Lexicon} % Entities
 
-\paragraph{The platform} is the app. It can be Spotify, Facebook, YouTube, etc. The platform hosts items to recommend. They have their own set of goals, usually maximizing revenue.
+More formally, a recommender system setting involves several entities.
 
-\paragraph{Content creators}, on the aforementioned platforms, are the ones creating new items on the platform. Musicians for Spotify, user profiles for Facebook, shops for Amazon. Some platforms, such as Last.fm  (music recommendation) or MovieLens (movie recommendation) have no content creator. Instead, they have a catalog of items provided by the platform. The content creators have their own incentive for using that platform: they make revenue based on views, they sell items, they get exposure, etc. If the platform does not care enough about them, they might stop creating content and the platform loses its value.
+\paragraph{The items} are the objects of interest of the application domain. For YouTube, these are videos, for Amazon these are products and for Spotify these are songs.
+
+\paragraph{The platform} is the application. It can be Spotify, Facebook, YouTube, etc. The platform hosts items to recommend. They have their own set of goals, usually maximizing revenue.
+
+\paragraph{Content creators} are the ones creating new items on the aforementioned platforms. Musicians for Spotify, user profiles for Facebook, shops for Amazon. Some platforms, such as Last.fm  (music recommendation) or MovieLens (movie recommendation) have no content creator. Instead, they have a catalog of items provided by the platform. The content creators have their own incentive for using that platform: they make revenue based on views, they sell items, they get exposure, etc. If the platform does not care enough about them, they might stop creating content and the platform loses its value.
 
 \paragraph{Users} are the ones exploring the items and interacting with them. They are YouTube's viewers, Spotify's listeners, Amazon's shoppers, etc. Users find value in the platform for various reasons: it hosts items they value, it allows discovering new items they like, etc. If the platform does not have their interest at heart, they might leave, decreasing revenue to both the platform and content creators.
 
@@ -27,7 +33,7 @@ I have been tasked with giving a shot at writing a recommender system for my cli
 
 \section{Recommender systems are hard to build}
 
-Recommender systems are hard to build. They face many challenges. We all bought a toilet seat once because the current one broke and then Amazon wanted us to buy more toilet seats for months like we were on some weird toilet seat collection spree. We all got angry at Spotify for playing a song we hate, at YouTube for recommending for the billionth time that video we kept ignoring purposefully. We try to give a few explanations of the challenges.
+Recommender systems are hard to build. They face many challenges. We all have friends who bought a toilet seat once because the current one broke and then Amazon wanted them to buy more toilet seats for months like they were on some weird toilet seat collection spree. We all got angry at Spotify for playing a song we hate, at YouTube for recommending for the billionth time that video we kept ignoring purposefully. We try to give a few explanations of the challenges.
 
 \subsubsection{No clear ground truth}
 
@@ -35,7 +41,7 @@ The main reason is that there is no clear answer or goal to maximize or even eva
 
 It's impossible, by design, to work out an unambiguously labeled dataset for a strict supervised task. The algorithms introduced later that look unambiguous and completely supervised, aiming at predicting a rating is not predicting what to display. Sure, that viewer seems to like romantic comedy, but if the system recommends romantic comedy ad nauseam, he will probably get bored and angry at that recommendation bubble. That's even worse if that user liked ONE romantic comedy and the recommendation engine interprets too strongly that spurious signal.
 
-\cite{recpurpose} analyses several ways recommender systems can serve different purposes, both from the users' and the platform's point of of view. As user purposes, they exemplify: show alternatives, show accessories, help exploration, entertainment, etc. For platform's purpose: create more demand, increase business success, increase activity, increase discoverability of items, learn about customers, etc.
+\citet{recpurpose} analyses several ways recommender systems can serve different purposes, both from the users' and the platform's point of of view. As user purposes, they exemplify: show alternatives, show accessories, help exploration, entertainment, etc. For platform's purpose: create more demand, increase business success, increase activity, increase discoverability of items, learn about customers, etc.
 
 The algorithms presented here follow the trend and present recommendation as analogous to rating prediction, but this is a fairly severe assumption.
 
@@ -43,7 +49,7 @@ The algorithms presented here follow the trend and present recommendation as ana
 
 Recommender systems might have the tendency to not balance enough exploitation of safe or known items and exploration of other items. This locks users in a fairly limited subset of items, and limits their ability to discover content, or even giving the false impression that there is no other content.
 
-You just bought a shelf, and now Amazon wants you to buy every other shelves. You listen to rock music, you've never ever been recommended a single rap song, etc. Those are recommendation bubbles. You are getting recommended only items that are similar to things you already know and like, without any exploration or novelty. Sometimes, this is expected and a good thing: if you hate some type of music, it's okay not being exposed to it. Sometimes, you are missing out: you're not being recommended this great movie just because your past watch session inclines you more towards movies of lesser popularity matching a bit more the features you like. Finally, it can also be plain detrimental: being a flat earther whose recommendations include more flat earth fake news and not a single scientifically valid and informative video. Having political point of views that keeps you from being exposed to opinions opposed to yours, but gets you recommendations of more and more extreme content. \citep{filterbubble, filterbubblebook}
+You just bought a shelf, and now Amazon wants you to buy every other shelves. You listen to rock music, you've never ever been recommended a single rap song, etc. Those are recommendation bubbles. You are getting recommended only items that are similar to things you already know and like, without any exploration or novelty. Sometimes, this is expected and a good thing: if you hate some type of music, it's okay not being exposed to it. Sometimes, you are missing out: you're not being recommended this great movie just because your past watch session inclines you more towards movies of lesser popularity matching a bit more the features you like. Finally, it can also be plain detrimental: being a flat earther whose recommendations include more flat earth fake news and not a single scientifically valid and informative video. Having political point of views that keeps you from being exposed to opinions opposed to yours, but gets you recommendations of more and more extreme content  \citep{filterbubble, filterbubblebook}.
 
 Recommendation bubbles must be at least considered when building a recommender system, and whether to fight against it or not by adding some randomness or exploration bias to the system.
 
@@ -66,7 +72,7 @@ Finally, what should be done with a new user or item? A new user might not have 
 
 Related to the cold start problem is \emph{fairness}. Fairness might not matter for Netflix but might be of primal importance when the content is proposed by users, such as Amazon Marketplace or YouTube. Taking fairness into account is making sure that the system is not overly biased towards old and/or popular items, so that newcomers or smaller artists can still get recommended. Failing to account for fairness is making the system useless for the long tail items and narrowing the recommendations to top popular items. Users might benefit from more diversity and content creators get some benefit getting involved into the platform. \cite{popularitybias} inspects popularity bias, \cite{longtail} explores long tail items in music recommendation.
 
-The long tail items are the ones - usually the majority - that get a much lower popularity than the top popular items. For some platforms, the value lies in exploiting the long tail items through personalization. It ensures that a valuable majority of items does not remain dormant. Figure \ref{fig:long-tail} shows the popularity distribution of my client's items. Failing to recommend long tail items would make it a bad platform for content creators and just a waste of hard drive space.
+The long tail items are the ones - usually the majority - that get a much lower popularity than the top popular items. For some platforms, the value lies in exploiting the long tail items through personalization. It ensures that a valuable majority of items does not remain dormant. Figure \ref{fig:long-tail} shows the popularity distribution of the client's items. Failing to recommend long tail items would make it a bad platform for content creators and just a waste of hard drive space.
 
 \section{Types of recommender systems}
 
@@ -81,7 +87,7 @@ Those algorithms assume that a given user $u_i \in \mathcal{U}$ emits explicit o
 \begin{figure}
     \centering
     \includegraphics[scale=0.5]{70-files/collaborative-filtering.pdf}
-    \caption{In collaborative filtering, we aim to guess the ratings one user would give to an item given the rating similar users gave. Would she like Shrek because she liked The Dark Knight like user 1, or dislike Shrek becaue she liked Memento like user 2?}
+    \caption{In collaborative filtering, we aim to guess the ratings one user would give to an item given the rating similar users gave. Would she like Shrek because she liked The Dark Knight like user 1, or dislike Shrek becaue she liked Memento like user 2? Picture from \url{https://developers.google.com/machine-learning/recommendation/collaborative/basics}}
     \label{fig:collab-filtering}
 \end{figure}
 
@@ -114,14 +120,14 @@ The $k$-Nearest-Neighbors algorithm allows to classify or regress to a value giv
 
 Let ${(x_0, y_0), ..., (x_N, y_N)}$ be a dataset of $N+1$ examples $x_i$ and their labels $y_i$. Classifying a query $q$ involves finding the $k$ most similar $x_i$ to $q$ under distance $d(\cdot, \cdot)$, and taking a majority vote of their class label $y_i$. For instance, if $k=1$,
 
-$$kNN(q) = y_a; a = \arg \min_{i=0..N} d(x_i, q)$$
+$$\text{kNN}(q) = y_a \text{ with } a = \operatorname*{argmin}_{i=0..N} d(x_i, q)$$
 
 Here, we will use the cosine distance as the distance $d(\cdot, \cdot)$. In case of a regression task, the labels of the $k$ most similar items is averaged.
 
 
 \subsubsection{kNN applied to recommendation}
 
-To predict the ratings $\hat{r}_i,j$ that a user $u_i$ would give to a content $c_j$, \emph{UserkNN} takes the $k$ users most similar to $u_i$ and who have rated $c_i$. Their ratings value for item $c_j$ is averaged.
+To predict the ratings $\hat{r}_{i,j}$ that a user $u_i$ would give to a content $c_j$, \emph{UserkNN} takes the $k$ users most similar to $u_i$ and who have rated $c_j$. Their ratings value for item $c_j$ is averaged.
 
 
 \emph{ItemkNN} takes the problem the other way around. We search for the $k$ items $c_k$ most similar to $c_j$ that had been rated by the active user $u_i$. The ratings that user gave to those similar items is averaged to predict $\hat{r}_{i,j}$.
@@ -139,19 +145,19 @@ There are multiple possible variations depending on how we decide to represent t
 \begin{figure}
     \centering
     \includegraphics[scale=0.5]{70-files/matrix-factorization.pdf}
-    \caption{The ratings matrix is decomposed as the inner product of user latent factors and movies latent factors, discovered during learning. They can be inspected to find semantically meaningful features. Image source: }
+    \caption{The ratings matrix is decomposed as the inner product of user latent factors and movies latent factors, discovered during learning. They can be inspected to find semantically meaningful features. Image source: \url{https://developers.google.com/machine-learning/recommendation/collaborative/basics}}
     \label{fig:matrixfactorization}
 \end{figure}
 
-\citet{funkmf} proposes a \emph{Matrix Factorization} approach that interprets the ratings matrix $r$ as the multiplication of a user matrix $A$ and a content matrix $B$ such that $r=AB^T$. Those matrices are of shape $|\mathcal{U}|\times k$ and $|\mathcal{C}| \times k$, where $k$ is a free parameter of the implementer's choice which represents the number of latent dimensions used to represent each user and content. We learn them when $r_{i,j}$ is known by minimizing the mean square error while regularizing both matrices
+\citet{funkmf} proposes a \emph{Matrix Factorization} approach based on \ac{SVD}-like that interprets the ratings matrix $r$ as the multiplication of a user matrix $A$ and a content matrix $B$ such that $r=AB^T$. Those matrices are of shape $|\mathcal{U}|\times k$ and $|\mathcal{C}| \times k$, where $k$ is a free parameter of the implementer's choice which represents the number of latent dimensions used to represent each user and content. We learn them when $r_{i,j}$ is known by minimizing the mean square error while regularizing both matrices
 
-$$ \min_{A, B} (r_{i,j} - A_i \cdot B_j)^2 + \lambda ||A+B||^2$$
+$$ \min_{A, B} (r_{i,j} - A_i \cdot B_j)^2 + \lambda_A ||A||^2+\lambda_B||B||^2$$
 
 where $\lambda$ is the hyperparameter controlling the regularization strength. The unknown values can then be predicted $\hat{r}_{i,j} = A_i \cdot B_j$.
 
 The greater $k$, the more latent factors can be learnt about users and items, the smaller the training error is but the overfitting risk increases. There are various ways to increase this model complexity and account for various biases or features.
 
-Those embeddings can be analyzed to find semantically meaningful latent dimensions, like movie genre or target age group \citep{mflatents}. Illustrative examples are shown in figure \ref{fig:matrixfactorization}.
+Those embeddings can be analyzed to find semantically meaningful latent dimensions, like movie genre or target age group (Figure 2 of \citep{mflatents}). Illustrative examples are shown in figure \ref{fig:matrixfactorization}.
 
 Pure MF methods need a full retrain at each new user, content or new interaction and suffer from a cold start problem : each user and content is treated independently. 
 
@@ -167,14 +173,14 @@ Instead of learning latent factors, one can learn how items recommend other item
 \end{split}
 \end{equation}
 
-where $\beta$ and $\lambda$ are the hyperparameters regularizing, respectively, the $\ell_1$ aiming for a sparse $W$ and the $\ell_2$ norm preventing overfitting. The diagonal of $W$ is forced to zero so that items can't recommend themselves and fall into that trivial solution. Given that both $r$ and $W$ are very sparse, computing $\hat{r}=rW$ can be done very fast with sparse aware math libraries.
+where $\beta$ and $\lambda$ are the hyperparameters regularizing, respectively, the $L_1$ aiming for a sparse $W$ and the $L_2$ norm preventing overfitting. The diagonal of $W$ is forced to zero so that items can't recommend themselves and fall into that trivial solution. Given that both $r$ and $W$ are very sparse, computing $\hat{r}=rW$ can be done very fast with sparse aware math libraries.
 
-\subsection{$\text{EASE}^\text{R}$}
+\subsection{\acf{EASER}}
 
 When the matrix $W$ of SLIM fits in memory, \citet{easer} proposes to remove the sparsity constraint and the positivity constraint. They devise a closed-form solution that allows for much faster learning. The results are on par or better than SLIM.
 
-\section{\emph{\arr Project}: Hexaglobe's RecSys}
-
+\section{\arr \emph{Project}: Hexaglobe's RecSys}
+\label{sec:our-recsys}
 \subsection{Problem setting}
 
 The client I am working for has 7M videos to index and recommend. They need recommendations in two places: on the homepage, and on a video page, as "continue watching" suggestions. The current homepage system is a country-wise top popular pick refreshed every hours mixed with some new uploads in order to fight the cold start problem. The "continue watching" suggestions are gathered from videos having similar search terms.
@@ -190,7 +196,7 @@ What should be further emphasized is that the baseline algorithms outlined above
 The system has some constraints to operate under in order to be useful in our production environment:
 
 \subsubsection{Latency}
-The system must return a recommendation response in under 30 ms
+The system must return a recommendation response in under 30 ms.
 
 \subsubsection{Cold start for videos}
 Around 15k videos are uploaded each day. Without a manual shuffling from our part or serendipity aware recommender algorithm, many of those videos would not get a single view, turning them into dead items. The system must not rely on collaborative features only for representing videos.
@@ -222,17 +228,24 @@ We propose avoiding the cold start problem by learning a user embedding function
 
 Which is similar to the previous method but computes the video embeddings from a model instead of learning them as weights. This enables to use video metadata to generate embeddings, and possibly be more data efficient: $g$ has access to metadata to know which video are similar or not, instead of having to discover that from user behavior alone. Moreover, when a new video arrives on the platform, we can predict an embedding, instead of it being a dead item without user feedback, making it impossible to learn an embedding for it.
 
+
+It is interesting to note that this particular approach is in itself a Matrix Factorization parameterized by a neural network instead of learnt embeddings. At its core still lays the idea of maximizing the dot product between the user's and the relevant videos' embeddings. Interestingly, \citet{dlinrec} acknowledges the work done by \citet{neumf}, proposing this architecture. Instead, it focuses only another proposed architecture, which does not perform as well, in which the explicit dot product is replaced by an \acf{MLP}. \citet{neumf} even dives into explanations as to why the explicit dot product performs favorably. We are in this situation, left out by \citet{dlinrec}.
+
+We should also emphasize again that traditional recommender system are trained on ratings. When user provided ratings are not available, implicit ratings are derived from user activity, based on domain knowledge, or heuristics. Predicting the next seen videos alleviate this need as well, and the aforementioned problem of cold start. The downside is that traditional models run fast, which is needed for real time recommendation, and neural networks usually need significantly more compute. The latency of the system has to be carefully taken care of, or the website would take more time to load, impacting the user experience very negatively.
+
+Figure \ref{fig:xvrec-model} exhibits the model. It can be seen that there are two main components: a user encoder and a video encoder. The next sections will dive into those in detail.
+
 \subsubsection{User network}
 
-The user network is a 2-layers MLP with 1024 hidden units and 64 output units. All categorical variables have an associated learnt embedding using pytorch's $\texttt{nn.Embedding}$ layer. When a categorical variable can take multiple values at the same time (like video tags), the embeddings of all tags are averaged, thanks to pytorchs's $\texttt{nn.EmbeddingBag}$. It encodes various features:
+The user network is a 2-layers \ac{MLP} with 1024 hidden units and 64 output units. All categorical variables have an associated learnt embedding using pytorch's $\texttt{nn.Embedding}$ layer which effectively transforms a discrete vector into a dense, learnable, continuous vector in latent space. The embedding of the $n$-th value of a categorical variable is $W^T \text{\textbf{one\_hot}(n)}$, where $W$ is a learnable matrix (basically extracting the $n$-th row of $w$). When a categorical variable can take multiple values at the same time (like video tags), the embeddings of all tags are averaged, thanks to pytorchs's $\texttt{nn.EmbeddingBag}$. It encodes various features:
 
 \begin{itemize}
-    \item \textbf{Profile features}: country and gender. Categorical variables like those use learnt embedding before going into the MLP.
-    \item \textbf{History features}: for the H previously seen, liked, favorited and disliked videos: their tags, their category, their main actors, their uploader's ID. The embeddings for all videos are concatenated. Sequences shorter than H are padded with zero embeddings. All the videos share the same embedding layers; there is no reason the tags from the last seen video must be encoded differently than the second to last. However, there is a reason to keep each video encoding separate, so that the network can estimate if the user's history is diversified or not, what was the previous seen videos so that it knows it can willingly decide to recommend it again or not, etc.
+    \item \textbf{Profile features}: country and gender. Categorical variables like those use learnt embedding before going into the \ac{MLP}.
+    \item \textbf{History features}: for the number H of previously seen, liked, favorited and disliked videos: their tags, their category, their main actors, their uploader's ID. The embeddings for all videos are concatenated. Sequences shorter than H are padded with zero embeddings. All the videos share the same embedding layers; there is no reason the tags from the last seen video must be encoded differently than the second to last. However, there is a reason to keep each video encoding separate, so that the network can estimate if the user's history is diversified or not, what was the previous seen videos so that it knows it can willingly decide to recommend it again or not, etc. 
     \item \textbf{Request features}: for now, the category the user is browsing the website for. It was crucial making sure that the system would not recommend videos from another category as it displeases users. 
 \end{itemize}
 
-The dimension of the $\texttt{nn.Embedding}$ vectors is equal to $\min(512, 1.6n^{0.56})$ with $n$ being the number of possible values for this variable (following FastAI's rule of thumb).
+The dimension of the $\texttt{nn.Embedding}$ vectors is equal to $\min(512, round(1.6n^{0.56}))$ with $n$ being the number of possible values for this variable (following FastAI library's empirical rule of thumb). We set tag embeddings to have 64 dimensions.
 
 \subsubsection{Video network}
 
@@ -249,7 +262,7 @@ The embedding layers for tags, actors, categories, and uploader ID are shared am
 
 \subsection{Training strategies}
 
-The data is sparse. There are a lot of different entities to embed, most of them being used rarely. In practice, this is a problem. The network could easily overfit and avoid learning a general recommendation function. Because they are rarely appearing, it may easily learn that tags 12, 68 and 98 identify video \#9786, and recognize user \#1234 from the history. The net would essentially learn nothing but a big table giving the ID of the next video given some user and timestamp and never form any semantic understanding.
+The data is sparse. There are a lot of different entities to embed, most of them being used rarely. In practice, this is a problem. The network could easily overfit and avoid learning a general recommendation function. Because they are rarely appearing, the model may easily learn that tags 12, 68 and 98 identify video \#9786, and recognize user \#1234 from the history. The net would essentially learn nothing but a big table giving the ID of the next video given some user and timestamp and never form any semantic understanding.
 
 In order to avoid such overfitting we propose to separately pretrain as much as the entities' embeddings as possible, and heavily regularize training.
 
@@ -269,12 +282,12 @@ Figure \ref{fig:word2vec} illustrates both CBOW and Skip-Gram models.
     \label{fig:word2vec}
 \end{figure}
 
-\paragraph{Tags} of a video, contrarily to words in a sentence, however, have no order. Deciding on a "center word" makes no sense, nor does "context window". We observe however that a user's watch history proposes a natural ordering. We thus considers all tags on a video to have the same position, and use the tags of previous and next videos as context. The target word is then a randomly picked word in the center video; tags from center and neighbouring videos are considered context as well. This already biases the embeddings towards recommendation. We use a context window of 5, that is, we use 2 videos before and after the center video as context.
+\paragraph{Tags} of a video, contrarily to words in a sentence, however, have no order. Deciding on a "center word" makes no sense, nor does "context window". A user's watch history is a natural ordering. We thus considers all tags on a video to be center tags, and use the tags of previous and next videos as context. The target word is then a randomly picked word in the center video; tags from center and neighbouring videos are considered context as well. This already biases the embeddings towards recommendation. We use a context window of 5, that is, we use 2 videos before and after the center video as context.
 
 
 We use the same strategy for words in the titles, also sampling context words, when applicable, from their multilingual translations. Stop words (pronouns, determiners, etc) that I am able to identify (French, English, Spanish) are removed.
 
-Inspecting the embeddings with a technique such as UMAP \citep{umap} shows great insight about our tags. For instance, anime tags are effectively clustered together, such as various groups of tags for various genres, scene types, or famous actors. For this only, computing the Word2Vec embeddings has value. One could envision running a k-means algorithm on those embeddings to create invisible meta-tags that help even more with the indexing, merging different tags but with the same meaning.
+Inspecting the embeddings with a technique such as \ac{UMAP} \citep{umap} shows great insight about our tags. For instance, anime tags are effectively clustered together, such as various groups of tags for various genres, scene types, or famous actors. From this alone, computing the Word2Vec embeddings has value. One could envision running a k-means algorithm on those embeddings to create invisible meta-tags that help even more with the indexing, merging different tags but with the same meaning.
 
 Those embeddings are used, frozen, in the recommendation model.
 
@@ -286,7 +299,7 @@ In order to both regularize the model and augment the data, dropout-based strate
     \item \textbf{DropTags}: There is a probability p to drop each tag in a video metadata.
     \item \textbf{RandLang}: Only one language is selected at random when there are multilingual data for the title
     \item \textbf{DropPop}: the popularity info is randomly dropped. This encourages fairness as well as the system learns not to recommend only videos with high popularity scores.
-    \item \textbf{DropChannel}: Sometimes drops the channel ID. The system learns not to rely only on popular uploaders.
+    \item \textbf{DropUploader}: Sometimes drops the uploader ID. The system learns not to rely only on popular uploaders.
 \end{itemize}
 
 
@@ -296,29 +309,49 @@ Following the findings in \citet{dlinrec}, a simpler matrix factorization approa
 
 We could then learn a shallower system such as Matrix Factorization or build a collaborative filtering matrix for a user-knn or item-knn approach, disregarding (almost) inactive users and unpopular videos. 
 
-For computing a score for a user or video (or both) not learned in the shallow model, a deep embedder net finds the closest known user / item, and the rating is taken from the corresponding entries in the shallow model.
+For computing a score for a user or video (or both) not learned in a shallow model, a deep embedder net finds the closest known user / item, and the rating is taken from the corresponding entries in the shallow model.
 
 \subsection{Experimenting with the model}
 
-In order to gain insight into our dataset, choose our hyperparameters and refine the model, we run a collection of experiments. The model is trained with batch size 256 and Adam for 40k iterations. The learning rate warms up for 5\% of the training iterations then linearly decays. We train our model in a contrastive fashion: the batch contains 256 queries $x_{0...255}$ and their 256 associated next videos watched $y_{0...255}$. All queries and videos are embedded and the dot product is computed for all pairs so that the matrix $a_{ij}$ contains the dot product of the embedding of $x_i$ and $y_j$. A row-wise softmax is performed on $a$, and the cross entropy loss is computed so that row $i$ must predict label $i$. This strategy naturally samples according to the items' popularity, thus creating harder negative examples than uniformly sampling items. It also directly embeds the popularity bias of the items, forcing the system to rely on the features rather than learning which items are popular and finding them among long tail items. Top1 accuracy is used as a metric. We use a similar setting for testing.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\columnwidth]{70-files/contrastive.pdf}
+    \caption{We train and evaluate our recommender system in a contrastive way. Batches of 256 pairs of histories and their next viewed video are loaded; the encoders learn to embed them so that the dot product of the real pair is greater than the ones of the other possible pairs formed in the batch. In other words, the encoders are learned so that $u_i \cdot v_i > u_i \cdot v_j$ with $i \neq j$.}
+    \label{fig:rec-contrastive}
+\end{figure}
 
+In order to gain insight into our dataset presented in Section \ref{sec:hhistory}, we choose our hyperparameters and refine the model, we run a collection of experiments. The model is trained with batch size 256 and Adam for 40k iterations. The learning rate warms up for 5\% of the training iterations then linearly decays. We train our model in a contrastive fashion: the batch contains 256 queries $x_{0},...x_{255}$ and their 256 associated next videos watched $y_{0}...y_{255}$. All queries and videos are embedded and the dot product is computed for all pairs so that the matrix $a_{ij}$ contains the dot product of the embedding of $x_i$ and $y_j$. A row-wise softmax is performed on $a$, and the cross entropy loss is computed so that row $i$ must predict label $i$ (see Figure \ref{fig:rec-contrastive}). 
+
+This strategy naturally samples according to the items' popularity. Sampling by popularity creates a harder prediction problem than uniformly sampling candidates items. It directly embeds the popularity bias of the items, forcing the system to rely on the features rather than learning which items are popular and finding them among long tail items. Top1 accuracy is used as a metric.
+
+Reusing the other examples in the batch as negative targets prevents manually inserting user-videos interaction features such as: has the user already seen this video? How older than the request is that video?. This however is not a bad thing: for latency reasons, it is better to precompute the embeddings of the videos, which is not possibly if they depend on the user and/or the request.
+
+For testing, we use an identical setting as for training. The only difference is that the testing set consists in an isolated set of users that have not been seen in training. However, the set of videos is shared between training and testing as it would be extremely hard to find a user split that also splits the seen videos in two disjoint sets.
 
 \subsubsection{Candidate videos encoder}
 
-We arbitrarily fix an history length of 2 with all user features as a starting point for running experiments. We add or ablate various features in the video encoder:
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\columnwidth]{70-files/video-encoder-tests.pdf}
+    \caption{Experiments on video encoder for a fixed user encoder. We aim to understand how features contribute to the classification information and build a model from this information. Test Top1 accuracy is indicated.}
+    \label{fig:video-enc-exp}
+\end{figure}
+
+
+We arbitrarily fix an history length of 2 with all user features as a starting point for running experiments. We add or ablate various features in the video encoder. Those experiments are also reported in Figure \ref{fig:video-enc-exp}. We report the Top1 test accuracy for each experiment.
 
 \begin{enumerate}
-    \item A featureless experiment as a sanity check, making sure the accuracy is 1/256=0.39\%, which gives 0.395\%, passing the test.
-    \item Only the category of the next requested item and candidate videos, giving 1.18\%. This is not surprising as there are only 3 main categories, which are notably unbalanced.
+    \item A featureless experiment as a sanity check, making sure the accuracy is 1/256=0.39\%, which gives 0.39\%, passing the test.
+    \item Only the category of the next requested item and of the candidate videos, giving 1.18\%. This is not surprising as there are only 3 main categories, which are notably unbalanced. It is important to recommend items within the correct category. This is a typical case where false positives are to be avoided. Despite not being very helpful in a Top1 test accuracy sense, this feature is of crucial importance.
     \item Only the video encoding quality of the videos, giving 0.8\%. The video quality does not seem to explain much of the user behavior.
-    \item Only the popularity scores, giving 5.86\%. This is quite surprising and would indicate that the dataset might not be enormously biased towards popular items. Or the popularity scores are computed in an unhelpful way.
+    \item Only the popularity scores, giving 5.86\%. This is quite surprising and would indicate that the dataset might not be enormously biased towards popular items. This hypothesis could not be verified, as the scores were computed some time ago and the code is not available anymore. Thus, the popularity scores may have been processed in an unhelpful way. 
     \item Only the uploader's ID, giving 20.25\%. It seems that this gives a lot of valuable information about the content, suitable for recommendation. A projection and visualization of the learnt uploader ID embeddings would help understand the semantic space they are organized into, and help get insight into the information extracted from the uploader ID.
-    \item Only 3 tags per video, giving 9.33\%. Tags embeddings have 64 dimensions.
+    \item Only 3 tags per video, giving 9.33\%.
     \item Only 5 tags per video, giving 12.27\%. There are substantial gains adding more tags.
     \item Only 10 tags per video, giving 15.09\%. Adding more tags still helps.
     \item Only 15 tags per video, giving 19.37\%. Adding even more tags still helps.
     \item Only 20 tags per video, giving 20.80\%. This yields diminishing returns, 15 looks good for tests.
-    \item Only 10 tags per videos, tags are pretrained, giving 17.92\%. This is a notable improvement from the random initialization. Does it help unfreezing the embeddings?
+    \item Only 10 tags per videos, tags are pretrained with Word2Vec, giving 17.92\%. This is a notable improvement from the random initialization. Does it help unfreezing the embeddings?
     \item Only 10 tags per videos, tags are pretrained and trainable, giving 19.22\%. Unfreezing tags embeddings help. Since we are challenging the performance with 15 tags, try with 15 pretrained and trainable tags.
     \item Only 15 tags per videos. Tags are pretrained and trainable, giving 22.74\%. The gains are still important.
     \item Uploader ID and 10 tags per videos. Tags are pretrained and trainable, giving 24.63\%. The uploader ID and tags do not bear totally redundant information.
@@ -330,25 +363,32 @@ We now have a pretty clear view of the importance of candidate video features. W
 
 \subsubsection{User encoder}
 
-Now, we run feature experiments on the user encoder.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\columnwidth]{70-files/user-encoder-tests.pdf}
+    \caption{Experiments on user encoder for a fixed video encoder. We aim to understand how features contribute to the classification information and build a model from this information. Test Top1 accuracy is indicated. Unless indicated otherwise, the history lenght H is set to 2}
+    \label{fig:user-enc-exp}
+\end{figure}
+
+Now, we run feature experiments on the user encoder, summed up in Figure \ref{fig:user-enc-exp}.
 
 \begin{enumerate}
     \item We remove all features from users, giving 0.3905\%. Sanity check passes, without features, we get 1/256 chances of being right.
     \item Only profile geolocation features, gives 1.84\%. This is surprising as location correlates with language which can be inferred, to some extent, from tags. We know that language does not constitutes a major feature of our videos, but the accuracy gain still looks quite low.
     \item Only requested category gives 1.20\%. This matches the previous results with main category only in candidate videos.
-    \item Only profile gender feature gives 0.6\%. Unsurprisingly, gender is a low indicator of user preference.
+    \item Only user profile's gender feature gives 0.6\%. Unsurprisingly, gender is a low indicator of user preference.
+    \item Only Uploader ID from history gives 20.33\%.
     \item Only 15 video tags from history gives 21.44\%. This jumps accuracy close to its maximum observed value.
     \item 15 video tags from history, video categories, request category, gives 22.77\%.
-    \item Only Uploader ID from history gives 20.33\%.
     \item 15 Tags, category from history, uploader IDs from history, and request category gives 24.32\%.
     \item Enabling all user features, growing from 2 to 5 elements in history increases from 25.45\% to 25.59\%. This is not enough for the increased computation.
     \item Using all user features, only 15 tags in candidate video encoder but only viewed videos in history, gives 22.54\%. Only dislikes yields 3.51\%. Only likes 4.58\%. Views and like, 22.40\%. Views and dislikes, 22.37\%. All of them, 22.74\%. We see that, contrarily to intuition, likes and dislikes bears little information compared to views. Moreover, this information is not only redundant but maybe slightly misleading, suggesting not using likes and dislikes in the model.
     \item Using only views, categories, uploader ID, we reach 24.04\%.
-    \item Using all data but gender (ie tags, categories, geolocation, uploader), with only past views from history, we reach 24.75\%. We consider that adding geolocation, even if it does not bring tremendous improvement, is very cheap and assume that it biases favorably the suggestions for a new user with localized 
+    \item Using all data but gender (ie tags, categories, geolocation, uploader, request, tags), with only past views from history, we reach 24.75\%. We consider that adding geolocation, even if it does not bring tremendous improvement, is very cheap and assume that it biases favorably the suggestions for a new user with localized 
     \item 25.05\% with views, likes and dislikes, confirming the improvement is marginal.
 \end{enumerate}
 
-We settle with a user encoder that uses all data but gender (ie tags, categories, geolocation, uploader), with only past views from history, reaching 24.75\%.
+We settle with a user encoder that uses all data but gender (ie tags, categories, geolocation, uploader, request, tags), with only past views from history, reaching 24.75\%.
 
 \subsubsection{Transforms}
 
@@ -356,8 +396,10 @@ We now evaluate our transforms.
 
 \begin{enumerate}
     \item We activate DropTags with probability 0.25, effectively randomly dropping a quarter of the tags during training. It gives 24.78\%, making no difference. Raising to 0.5 probability yields 23.89\%, impairing the training. DropTags is better kept off.
-    \item We activate DropChannel with probability 0.25 gives 24.63\%. Probability 0.5 gives 24.37\%.
+    \item We activate DropUploader with probability 0.25 gives 24.63\%. Probability 0.5 gives 24.37\%.
 \end{enumerate}
+
+We designed those transforms inspired by CutOut \cite{cutout} (Section \ref{sec:cutout}). The results suggest that randomly removing some input features during training does not make the model more robust as expected, but impairs learning instead.
 
 As it is sometimes the case with data augmentation, we experiment with less regularization and longer training schedule. We double the training time and reduce the weight decay from 0.1 to 0.01.
 
@@ -366,9 +408,11 @@ As it is sometimes the case with data augmentation, we experiment with less regu
     \item Reducing the weight decay brings our baseline to 24.91\%. Adding DropTags with probability 0.25 yields 24.05\%.
 \end{enumerate}
 
+It seems that DropTags starts to be moderately useful with more training iterations. Time and efforts would be better spent on feature engineering as suggested by all the previous experiments.
+
 \subsubsection{Further experiments}
-We finally want to evaluate the contribution of face recognition to the recommender system. Adding the detected identities as features goes to 26.84\%, demonstrating a noticeable effect in recommending content. The identities embeddings could be pretrained with word2vec, in a similar fashion to tags embeddings, maybe yielding even greater improvements
+We finally want to evaluate the contribution of face recognition to the recommender system. Adding the detected identities as features goes to 26.84\%, demonstrating a noticeable effect in recommending content. The identities embeddings could be pretrained with word2vec, in a similar fashion to tags embeddings, maybe yielding even greater improvements.
 
 \subsection{Discussion}
 
-Starting from \cite{youtuberec} we designed our own recommender system, guided with experimental results. We found out that tags are by far the most important features to be used, followed by uploader ID as each uploader has its own type of content. We expected our model to overfit and devised some data augmentation techniques; the experiments showed that overfitting was not a problem but DropTags still managed to be helpful. We also showed that pretraining embedding with Word2Vec immensely helps, and the next steps to be be taken for maximum rewards are probably pretraining identity and channel embeddings as well, probably by predicting the associated tags distribution or their co-occurences in users' watch history. The practical use of this model now has to be tested in real world condition, and A/B testing is needed in order to compare it to the current recommender system to verify its superiority in actually understanding users' preferences.
+Starting from \citet{youtuberec}, we designed our own recommender system, guided with experimental results. We found out that tags are  the most important features to be used, followed by uploader ID as each uploader has its own type of content. We expected our model to overfit and devised some data augmentation techniques; the experiments showed that overfitting was not a problem but DropTags still managed to be helpful. We also showed that pretraining embedding with Word2Vec noticeably helps (approximately +4\% going from random to pretrained tag embeddings). The next steps to be taken for maximum rewards are probably pretraining identity and uploader embeddings as well. This could be done by predicting the associated tags distribution or their co-occurences in users' watch history. The practical use of this model now has to be tested in real world condition, and A/B testing \cite{abtesting} is needed in order to compare it to the current recommender system to verify its superiority in actually understanding users' preferences.

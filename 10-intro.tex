@@ -1,53 +1,23 @@
-\chapter{TODO}
+\chapter{Introduction}
 
-The code is available at \url{https://github.com/Vermeille/thesis-code}.
+%FIXME LIS, recherche appliquée, CV
 
-Plan d'action :
+This summarizes four years of work and research in collaboration with Hexaglobe for my PhD. This took place in the Université de Toulon, Laboratoire Informatique et Système. The section I am in focuses on solving problems with automated statistical approaches, commonly called Machine Learning. Machine Learning uses algorithms that are able to learn patterns from data in order to make predictions on new data. In the last decade, neural networks, a class of those algorithms, got a lot traction. Researchers managed to stack many layers of neural networks, an approach now dubbed Deep Learning. Computer Vision, treats images in order to understand or process them in various way. Tremendous progress was achieved in Computer Vision thanks to new Deep Learning techniques, which will be the main focus of this work.
 
-Hexa:
-\begin{itemize}
-    \item Proposer un call à Frank/PA pour faire une lecture rapide et récupérer des infos complémentaires
+Hexaglobe a company providing video distribution platforms to many customers. The work plan was to dedicate the research and innovation efforts to a single customer willing to invest in order to lead its market. This customer has huge quantities of data, possibility to label datasets, and can provide hardware, making it a convenient deep learning research environment. As such, there is a strong emphasis on applied research as the problems treated are motivated by industrial challenges. The modern computer vision developments, started in 2015, were seen as a opportunity to modernize the underlying software of the video platform, enriching user experience through semantic analysis of the content.
 
-\end{itemize}
+The customer and Hexaglobe were motivated by the numerous press articles emphatic about computer vision astonishingly fast progresses in the deep learning era. They wanted to investigate how useful could deep learning be for a video streaming platform. Could new computer vision algorithms extract semantic information from pixels, useful for enhancing the user experience? Can deep learning outperform the recommender system currently in place, based on manual heuristics and popularity scores, using semantic information instead? Can we recognize and annotate persons famous in our domain, at scale (both in number of samples to labels and identities to recognize)? Can deep learning be used to \textbf{create and exploit metadata for video content recommendation}?
 
-Reco Actions
+A two steps work plan was made: first, extract face recognition metadata from videos, then build a recommendation engine using them and other available features and metadata. Chapter \ref{chap:hexa} will proceed to give more context about Hexaglobe, and the customer's datasets. Then, Chapter \ref{chap:activity} will outline how modern computer vision algorithms work: define the main components and examplify with an image classification project. Chapter \ref{chap:noise} acknowledges that our face recognition training dataset has noisy label issues and investigates state of the art methods of detecting and mitigating this issue. Chapter \ref{chap:fr} deals with face recognition in itself. We will see how one can leverage modern generative model with the intent to reinforce face recognition models in chapter \ref{chap:gan}. Chapter \ref{chap:recsys} lays out how we are building our customer's recommender system. Finally, Chapter \ref{chap:tch} will present the code framework developed supporting both research and industrial work.
+
+This document also highlights contributions:
+
 \begin{enumerate}
-    \item DONE: resultat
-    \item DONE: ablation: sans transfert
+    \item a survey on label noise in the context of deep image classification (Chapter \ref{chap:noise});
+    \item a novel loss function for metric learning applied to face recognition, Threshold-Softmax (Section \ref{sec:tsm});
+    \item a system for using and detecting distractors in the context of open-set face recognition (Section \ref{sec:our-facerec});
+    \item an improvement over the original Vector Quantized information bottleneck (Section \ref{sec:vqexpir});
+    \item a latent variable model for face swapping (Section \ref{sec:facegen});
+    \item a study of various design options for designing our customer's recommender system (Section \ref{sec:our-recsys});
+    \item a novel framework for deep learning work (Chapter \ref{chap:tch}).
 \end{enumerate}
-
-Face rec
-\begin{enumerate}
-    \item arcface verif -> classifiers \url{https://github.com/TreB1eN/InsightFace_Pytorch}
-    
-    \item Calibration: avant / après, distribution
-\end{enumerate}
-
-Expiration VQ
-\begin{enumerate}
-    \item DONE: histogram utilisation (age, entropy)
-    \item DONE: histogram utilisation sans aging (age, entropy)
-    \item DONE: Usage over testset
-    \item DONE: regarder xp robust vqvae (ppl vs iter (train / test), test MSE vs codebook size)
-    \item Classifier from features
-\end{enumerate}
-
-VQFace
-\begin{enumerate}
-    \item résultat négatif : Images dégueu VAE
-\end{enumerate}
-
-CondGAN Facegen ?
-
-Recommender:
-\begin{itemize}
-    \item Algorithms
-    \item figures
-\end{itemize}
-
-Tch:
-\begin{itemize}
-    \item Examples
-\end{itemize}
-
-Threshol softmax?

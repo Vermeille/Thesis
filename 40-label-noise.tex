@@ -1,8 +1,9 @@
 \chapter{\emph{\arr Contribution}: Label noise for face recognition}
+\label{chap:noise}
+
+\section{Introduction}
 
 Deep Learning systems have shown tremendous accuracy in image classification, at the cost of big, manually labeled, image datasets. Collecting such amounts of data can lead to labelling errors in the training set. Indexing multimedia content for retrieval, classification or recommendation can involve tagging or classification based on multiple criteria. In our case, we train face recognition systems for actors identification with a closed set of identities while being exposed to a significant number of distractors (actors unknown to our database). Face classifiers are known to be sensitive to label noise. We review recent works on how to manage noisy annotations when training deep learning classifiers, independently from our interest in face recognition.
-
-\section{Industrial context and Building Face Recognition}
 
 Our client wishes to extract as much metadata as possible from their content. For the video content we host, identifying the actors is very valuable. Indeed, those videos have recurring actors that are worth identifying, among many unknown people that should be ignored. Users get to search for the content from the same actors, or similar actors. In order to extract these data, we build a face recognition system. We collect a dataset of face recognition with our celebrities. First we selected the 50 most popular celebrities on the platform and scrape pictures automatically from the internet, quickly verifying them manually resulting in 1k+ pictures per identity. In a second phase, we collect data for all the lesser known actors we wish to recognize. As those second-phase actors are less known, it is harder to find data for them, making automatic web scraping unreliable, and we shift to a strategy that is both more reliable and less time consuming. Human annotators are tasked to manually download between 10 and 100 pictures per identity, by descending order of popularity.
 
@@ -204,10 +205,8 @@ Instead of getting a consistent wrong information from an erroneous label, \text
 
 \subsection{Unlabeling}
 
-%FIXME
 \textbf{Iterative Noise Filtering} \citep{IterativeNoiseFiltering}:
-A model is trained on the noisy dataset. An exponential moving average estimate of this model is then used to analyze the dataset. Samples classified correctly are considered clean, while the label is removed. The model is further trained with both a supervised and unsupervised objective for labeled and unlabeled samples. The samples with labels are used with a cross entropy loss. For each unlabeled sample, we maximize $\max_c f(x_i)_c$ in order to reinforce the model's prediction, while maximizing the entropy of the predictions over the whole batch to avoid degenerate solutions. Datasets labels are evaluated again according to the average model. Training restarts with removed and restored labeled % FIXME
-. This procedure is repeated while testing convergence improves.
+A model is trained on the noisy dataset. An exponential moving average estimate of this model is then used to analyze the dataset. Samples classified correctly are considered clean, while the label is removed for those classified incorrectly. The model is further trained with both a supervised and unsupervised objective for labeled and unlabeled samples. The samples with labels are used with a cross entropy loss. For each unlabeled sample, we maximize $\max_c f(x_i)_c$ in order to reinforce the model's prediction, while maximizing the entropy of the predictions over the whole batch to avoid degenerate solutions. After each epoch, the dataset's labels are evaluated again according to the average model. 
 
 \subsection{Label fixing}
 
@@ -215,8 +214,7 @@ A few methods already listed above try to fix the labels as part of their approa
 
 \textbf{Deep Self-Learning} \citep{SelfLearning} learns an initial net on noisy labels. Then, deep features are extracted for a subset of the dataset. A density estimation is made for each class and the most representative prototypes are chosen for each cluster. The similarity of all samples to each set of prototypes is computed to re-estimate correct labels $\Tilde{y}_i$. The model training continues with a double loss balancing learning from the original label or the corrected one $L=\lambda L_\text{CE}(f(x_i), \hat{y}_i) + (1-\lambda)L_\text{CE}(f(x_i), \Tilde{y}_i)$ with hyper-parameter $\lambda \in [0,1]$. We iterate between label correction and weighted training until convergence. Note that contrarily to sample weighting techniques that weigh the contribution of each sample in the loss, all samples have an equal importance, but we place a cursor as a hyper-parameter to balance between contribution from the noisy labels and corrected labels.
 
-\section{Discussion and conclusions}
-\subsection{Different strategies} % FIXME naming
+\section{Discussion}
 
 Those approaches cover a wide variety of use cases, depending on the dataset: whether is has verified or corrected labels or not, and the estimated proportion of noisy labels. They all have different robustness properties: some might perform well in low noise ratio but deteriorate quickly while others might have a slightly lower optimal accuracy but do not deteriorate as much with high noise ratio.
 
@@ -230,11 +228,12 @@ We can expect unlabeling techniques to grow as the semi-supervised and unsupervi
 
 Similarly, the label fixing strategies could benefit from unsupervised representation learning to learn prototypes that makes it easier to discriminate hard samples and incorrect samples. Deep self-learning \citep{SelfLearning} is shown to scale on Clothing1M and Food-101N. It would be expected that those approaches become less accurate as the number of classes grows or the classes get more ambiguous. Some prior knowledge or assumptions about the classes could be used explicitly by the model. Iterative Noise Filtering \citep{IterativeNoiseFiltering} in its entropy loss assumes that all the classes are balanced in the dataset and in each batch.
 
+\section{Conclusion}
+
+We explored the situation where a deep classifier has to be learnt on data with label noise, that is, containing erroneous target labels. We explored the literature and showed that the approaches can be sorted into four main categories: reweighting predictions using a noise model, reweighting the importance of training samples based on their assessed probability of having a wrong label, unlabel the suspicious samples and use them with unsupervised training, or fixing the suspicious labels with new guesses.
+
 Training a deep classifier using a noisy labeled dataset is not a single problem but a family of problems, instantiated by the data itself, noise properties, and provided manual annotations if any. As types of problems and solutions will reveal themselves to the academic and industrial deep learning practitioners, deciding on a single metric, a more thorough and standardized set of tests might be needed. This way, it will be easier to answer questions about the use of domain knowledge, generality, tradeoffs, strengths and weaknesses, of noisy labels training techniques depending on the use-case.
 
-\subsection{In Face Recognition} % FIXME naming and intro
+In the face recognition system that we are building, label noise have varying causes: persons with similar names; confusion with lookalikes; related persons that appear together; erroneous faces detected on signs or posters in the picture; errors from the face detector that are not faces; and random noise. All those situations represent label noise with different characteristics and properties that must be handled with those algorithms. We believe those issues are more general than this scenario and find an echo in the broader multimedia tagging and indexing domain.
 
-In the face recognition system, that we are building, label noise have varying causes: persons with similar names; confusion with lookalikes; related persons that appear together; erroneous faces detected on signs or posters in the picture; errors from the face detector that are not faces; and random noise. All those situations represent label noise with different characteristics and properties that must be handled with those algorithms. We believe those issues are more general than this scenario and find an echo in the broader multimedia tagging and indexing domain.
-
-%FIXME transition
-The approaches laid out here only handle closed-set noise by design, and while adding an additional artificial class for out-of-distribution samples can be imagined, none of the works reviewed here explored this strategy.
+From this study we mainly keep that samples with label errors produce higher losses than correctly labeled ones. The next chapter will explore how to leverage this in order to manually curate our training set. Furthermore, as we will show, a face recognition dataset contains pictures of many identities, but can also include pictures that do not belong to any of the known identities. This situation is reminiscent of the open-set label error (when the correct label does not belong to any of the known label) or unlabeled samples.

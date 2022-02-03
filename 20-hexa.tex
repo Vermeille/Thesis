@@ -1,10 +1,9 @@
-\chapter{Hexaglobe}
+\chapter{Industrial Context}
+\label{chap:hexa}
 
-%CF ANRT
+\section{Introduction}
 
-%\url{https://docs.google.com/document/d/1P65-ilrIhAxT9u5X-E_sTAplCMeGbK9IrOjzs21DI1k/edit}
-
-\section{Activities}
+In order to understand the work that has been done during this PhD, it is preferable to first contextualize it. Hexaglobe will be presented first, along with their problems and motivations. Then, Section \ref{sec:hexadata} will introduce the internal datasets developed internally in order to approach the problems that we aim to solve. 
 
 Hexaglobe provides all types of companies in the modern media landscape with technologies and professional services covering the entire process from video ingest to delivery.
 
@@ -23,6 +22,7 @@ The customer I have been affected to has a massive database of 9M+ user uploaded
 It would also be interesting to modernize the older content with quality enhancement and super resolution techniques, a thing I kept in mind while learning about generative models. This, however, is far beyond the scope of this thesis.
 
 \section{Data}
+\label{sec:hexadata}
 
 Throughout the thesis, three datasets have been created and are continuing to be developed as an ongoing process. Those datasets need to be refined, completed, and changed in order to fit the ever growing industrial needs. They are used for training and evaluating models before deployment.
 
@@ -31,7 +31,7 @@ Due to the confidential nature of the datasets, the nature of the data and examp
 \subsection{HActions}
 \label{sec:hactions}
 
-This first dataset has been manually labeled on my own. It contains pictures of natural images of people going on about what are supposed to be the 12 most popular activities on the website's videos, labeled A to M, plus an extra class that represents any other activity and another one for title screens / text screens showing no humans. The distribution of data samples is shown in Figure \ref{fig:xactions}.
+This first dataset has been manually labeled on my own. It contains pictures of natural images of people going on about what are supposed to be the 12 most popular activities on the website's videos, labeled A to M, plus an extra class that represents any other activity and another one for title screens / text screens showing no humans. The distribution of data samples is shown in Figure \ref{fig:xactions} and a few samples in Figure \ref{fig:xactionsamples}.
 
 In many activity recognition tasks, the environment can be extremely informative. For instance, karting, canyoning, sailing, driving, climbing, all take place in different environments and there activity clues scattered all over the picture. However, our situation, those activities are decided by body position rather than environment. In some sense, sleeping, singing, dining, watching TV or playing games all take place in a domestic environment and a classifier would have very little clues in the environment to sort them out. Special care would be needed to make sure the classifier do not overfit on spurious background elements for instance.
 
@@ -59,7 +59,7 @@ Instead of randomly splitting the pictures among train / validation / test sets,
 
 Automatic face recognition would bring very valuable metadata to our content. In our business, identifying celebrities in our domain is one of the core feature that the website's visitors would find valuable.
 
-The dataset contains 8938 identities, but is growing every day as we wish to recognize more people. The distribution of the number of pictures per identities is shown in Figure \ref{fig:xfaces-num}. The dataset has been built with balance in mind. After collecting few very famous identities with web scraping, the labelers have been tasked to manually collect 100 pictures per identity when possible.
+The dataset contains 8938 identities, but is growing every day as we wish to recognize more people. The distribution of the number of pictures per identities is shown in Figure \ref{fig:xfaces-num} and a few samples in Figure \ref{fig:xfaces-samples}. The dataset has been built with balance in mind. After collecting few very famous identities with web scraping, the labelers have been tasked to manually collect 100 pictures per identity when possible.
 
 Our face dataset is divided into two data sources: faces coming from promotional pictures and coming from videos. Faces coming from pictures are easier to collect but are prone to domain mismatch with videos as they are cleaner: the faces are usually not occluded, there is no motion blur, lighting is good and people tend to smile. In videos, none of this might hold true. We collected many pictures from photos and a smaller bunch from videos in order to evaluate and eventually mitigate the domain mismatch between both.
 
@@ -77,20 +77,20 @@ Our face dataset is divided into two data sources: faces coming from promotional
     \label{fig:xfaces-samples}
 \end{figure}
 
-The dataset has been complemented with MS1Mv2 \citep{celeb1m} to provide the so-called "distractors", developped in section \ref{sec:facerec}.
+The dataset has been complemented with MS1Mv2 \citep{celeb1m} to provide the so-called "distractors", developped in section \ref{sec:our-facerec}.
 
 \subsection{HHistory}
-
+\label{sec:hhistory}
 \begin{figure}
     \centering
     \includegraphics[width=\columnwidth]{20-files/video_views.pdf}
     \caption{Number of views per videos (sorted). Each video is a thin vertical bar.}
-    \label{fig:my_label}
+    \label{fig:xhistory-views}
 \end{figure}
 
 Finally, there is a dataset of premium users' browsing history. This dataset is here to provide historical data for building a recommender system, analyze trends, study semantic proximity of items, etc. This could be useful in various way : videos frequently watched together can serve as contrastive / metric learning dataset to learn about visual features that makes them similar, can learn about tag proximity as well, etc. This dataset can be of many uses and the only metric really lacking is the lenght of watch time per video in order to assess the interest of the user.
 
-Premium content is only a subset of the whole content. The dataset has 135,984 users (content uploader), 3,673 channels and 139,711 videos. It contains various user information, many being optional:
+Premium content is only a subset of the whole content. The dataset has 135,984 users (content uploader), 3,673 channels and 139,711 videos. The distribution of views is in Figure \ref{fig:xhistory-views}. It contains various user information, many being optional:
 
 \begin{enumerate}
     \item user ID
@@ -140,3 +140,11 @@ To work, Hexaglobe provides me three machines, hosted by our Cloud computing pro
 \end{enumerate}
 
 The university also provided several clusters that I could use when working on public datasets.
+
+\section{Conclusion}
+%FIXME
+In this chapter, we presented the company who supported the thesis and their industrial needs: they provide video platforms to customers. In order to improve their products, they would like to explore what Deep Learning has to offer for extracting metadata. Those metadata would be used to enrich searchability, sorting, user experience and recommendation. It then appears coherent to first focus on extracting activity and face recognition to collect the most important features, then build a recommender system using them.
+
+We are developing three datasets, one for each task: HActivity for activity recognition, HFaces for face recognition, and HHistory for the recommender system.
+
+In the next chapters, we will be exploiting those datasets in order to develop and improve models.
